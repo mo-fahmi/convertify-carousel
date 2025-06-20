@@ -1,0 +1,144 @@
+{% # Load the CSS %}
+{{ 'cst-convertify.css' | asset_url | stylesheet_tag }}
+
+  <div class="page-width" style="padding-top: {{ section.settings.padding_top }}px; padding-bottom: {{ section.settings.padding_bottom }}px; --_cards-aspect-ratio: {{ section.settings.cards_aspect_ratio }}">
+
+  {% # 1> Section Header & Paragraph %}
+  <div class="convertify-text-container convertify-text--{{ section.settings.header_position }}">
+    {% unless section.settings.section_header == blank %}
+      <h2 class="h2 convertify-header">{{ section.settings.section_header }}</h2>
+    {% endunless %}
+    {% unless section.settings.paragraph == blank %}
+      <p class="convertify-paragraph">{{ section.settings.paragraph }}</p>
+    {% endunless %}
+  </div>
+
+  {% # 2> Carousel container %}
+  <ul class="convertify-carousel">
+    {% for block in section.blocks %}
+      {% # Note: In real production I would use something like metaobjects for an idea like this, but since we're not on the same environment yet I will do it with blocks instead %}
+
+      {% unless block.settings.card_image == blank %}
+        <li class="convertify-card" {{ block.shopify_attributes }}>
+          <div class="card-image-wrapper">
+            {{ block.settings.card_image | image_url: width: 300 | image_tag: class: 'card_image' }}
+          </div>
+          {% if block.settings.card_handle != blank %}
+            {% if block.settings.card_handle_url != blank %}
+              <a
+                class="card-handle handle--link"
+                href="{{ block.settings.card_handle_url }}"
+                target="_blank">
+                {{ block.settings.card_handle }}
+              </a>
+            {% else %}
+              <p class="card-handle">{{ block.settings.card_handle }}</p>
+            {% endif %}
+          {% endif %}
+        </li>
+      {% endunless %}
+
+    {% endfor %}
+  </ul>
+
+</div>
+
+
+{% schema %}
+  {
+    "tag": "section",
+    "class": "section-convertify",
+    "name": "Convertify",
+    "settings": [
+      {
+        "type": "text",
+        "id": "section_header",
+        "label": "Section header"
+      },
+
+      {
+        "type": "inline_richtext",
+        "id": "paragraph",
+        "label": "Paragraph"
+      },
+      {
+        "type": "select",
+        "id": "header_position",
+        "label": "Text position",
+        "default": "left",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          }, {
+            "value": "center",
+            "label": "Center"
+          }
+        ]
+      },
+      {
+        "type": "select",
+        "id": "cards_aspect_ratio",
+        "label": "Cards aspect ratio",
+        "default": "4/5",
+        "info": "Width : Height",
+        "options": [
+          {
+            "value": "1/1",
+            "label": "1:1"
+          }, {
+            "value": "2/3",
+            "label": "2:3"
+          }, {
+            "value": "4/5",
+            "label": "4:5"
+          }
+        ]
+      }, {
+        "type": "range",
+        "id": "padding_top",
+        "label": "Padding Top",
+        "min": 0,
+        "max": 60,
+        "step": 5,
+        "default": 30,
+        "unit": "px"
+      }, {
+        "type": "range",
+        "id": "padding_bottom",
+        "label": "Padding Bottom",
+        "min": 0,
+        "max": 60,
+        "step": 5,
+        "default": 30,
+        "unit": "px"
+      }
+    ],
+    "blocks": [
+      {
+        "name": "Card",
+        "type": "carousel_card",
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "card_image",
+            "label": "Card Image"
+          }, {
+            "type": "text",
+            "id": "card_handle",
+            "label": "Card Handle"
+          }, {
+            "type": "url",
+            "id": "card_handle_url",
+            "label": "URL"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Convertify"
+      }
+    ]
+  }
+{% endschema %}
